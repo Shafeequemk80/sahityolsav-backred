@@ -24,7 +24,7 @@ app.get("/",async (req, res) => {
         const{category,item}=req.query
         console.log(req.query);
     const resultData=  await Result.findOne({category:category,item:item})
-console.log(resultData);
+console.log(resultData,'data');
     res.status(201).json({
        data:  resultData,
       });
