@@ -26,7 +26,7 @@ app.get("/",async (req, res) => {
     const resultData=  await Result.findOne({category:category,item:item})
 console.log(resultData,'data');
     res.status(201).json({
-       data:  resultData,
+       data:  resultData||false,
       });
     } catch (error) {
       console.log(error.message);
