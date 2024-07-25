@@ -1,19 +1,8 @@
     const { strict } = require('assert')
     const mongoose= require('mongoose')
-    const { type } = require('os')
 
-    const resultData=new mongoose.Schema({
-        position:{
-            enum:['first','second','third']
-        },
-        name:{
-            type:String
-        },
 
-        unit:{
-            type:String
-        }
-    })
+
 
     const ResultSchema= new mongoose.Schema({
 
