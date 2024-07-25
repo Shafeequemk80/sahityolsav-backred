@@ -3,7 +3,14 @@ const ImageData = require("../models/imageDataModel");
 // Update the image record
 const fs = require("fs");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config();
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 const getData = async (req, res) => {
   try {
     const { category, item } = req.query;
@@ -19,7 +26,6 @@ const getData = async (req, res) => {
   }
 };
 
-
 const addImage = async (req, res) => {
   try {
     let colors = req.body.color.split(",");
@@ -28,7 +34,7 @@ const addImage = async (req, res) => {
     let updatedImages = {
       image1: { image: null, color: colors[0] || "light" },
       image2: { image: null, color: colors[1] || "light" },
-      image3: { image: null, color: colors[2] || "light" }
+      image3: { image: null, color: colors[2] || "light" },
     };
 
     const images = ["image1", "image2", "image3"];
@@ -38,11 +44,23 @@ const addImage = async (req, res) => {
       images.forEach((imageKey, index) => {
         if (req.files[imageKey]) {
           if (existingImages[imageKey].image) {
-            fs.unlinkSync(path.join(__dirname, "../public/results", existingImages[imageKey].image));
+            cloudinary.uploader.destroy(
+              existingImages[imageKey].public_id,
+              (error, result) => {
+                if (error) {
+                  console.error("Error deleting image:", error);
+                } else {
+                  console.log("Image deleted successfully:", result);
+                }
+              }
+            );
           }
-          updatedImages[imageKey].image = req.files[imageKey][0].filename;
+          updatedImages[imageKey].image = req.files[imageKey][0].path;
+          updatedImages[imageKey].public_id = req.files[imageKey][0].filename;
         } else {
           updatedImages[imageKey].image = existingImages[imageKey].image;
+          updatedImages[imageKey].public_id =
+            existingImages[imageKey].public_id;
         }
 
         // Update color only if provided
@@ -62,7 +80,8 @@ const addImage = async (req, res) => {
       // If no existing images, create a new record
       images.forEach((imageKey, index) => {
         if (req.files[imageKey]) {
-          updatedImages[imageKey].image = req.files[imageKey][0].filename;
+          updatedImages[imageKey].image = req.files[imageKey][0].oath;
+          updatedImages[imageKey].public_id = req.files[imageKey][0].filename;
         }
       });
 
@@ -72,7 +91,9 @@ const addImage = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -81,7 +102,7 @@ module.exports = addImage;
 const showImage = async (req, res) => {
   try {
     const savedData = await ImageData.find();
-console.log(savedData);
+
     res.json({ data: savedData[0] });
   } catch (error) {
     console.log(error.message);
