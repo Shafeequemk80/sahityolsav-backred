@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 
+const ImageSchema = new mongoose.Schema({
+  image: { type: String, default: "defaultImage.jpg" },
+  color: { type: String, default: "light" }
+});
+
 const ImageDataSchema = new mongoose.Schema({
-  images: {
-    image1: { type: String},
-    image2: { type: String },
-    image3: { type: String },
-  },
+  image1: ImageSchema,
+  image2: ImageSchema,
+  image3: ImageSchema
 });
 
 const ImageData = mongoose.model("ImageData", ImageDataSchema);
