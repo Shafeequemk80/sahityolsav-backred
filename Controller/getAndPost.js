@@ -129,13 +129,13 @@ const postData = async (req, res) => {
     const resultData = [];
 
     if (firstPrice !== undefined && firstUnit !== undefined) {
-      resultData.push({ price: firstPrice, unit: firstUnit });
+      resultData.push({ firstPrice,  firstUnit });
     }
     if (secPrice !== undefined && secUnit !== undefined) {
-      resultData.push({ price: secPrice, unit: secUnit });
+      resultData.push({secPrice, secUnit });
     }
     if (thirdPrice !== undefined && thirdUnit !== undefined) {
-      resultData.push({ price: thirdPrice, unit: thirdUnit });
+      resultData.push({ thirdPrice,  thirdUnit });
     }
 
     const existingData = await Result.findOne({ category, item });
