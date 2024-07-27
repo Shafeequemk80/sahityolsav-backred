@@ -115,7 +115,7 @@ const showImage = async (req, res) => {
 const postData = async (req, res) => {
   try {
     const {
-      resultCount,
+    
       category,
       item,
       firstPrice,
@@ -141,7 +141,7 @@ const postData = async (req, res) => {
     const existingData = await Result.findOne({ category, item });
 
     if (existingData) {
-      resultCount?  existingData.resultCount=resultCount:existingData.resultCount
+  
       existingData.result = resultData;
       await existingData.save();
       res.status(200).json({ message: "Data updated successfully" });
