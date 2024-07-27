@@ -97,7 +97,7 @@ const addImage = async (req, res) => {
   }
 };
 
-module.exports = addImage;
+
 
 const showImage = async (req, res) => {
   try {
@@ -126,30 +126,41 @@ const postData = async (req, res) => {
       thirdUnit,
     } = req.body;
 
-    const newResult = new Result({
-      resultCount,
-      category,
-      item,
-      result: [],
-    });
+    const resultData = [];
 
     if (firstPrice !== undefined && firstUnit !== undefined) {
-      newResult.result.push({ firstPrice, firstUnit });
+      resultData.push({ price: firstPrice, unit: firstUnit });
     }
     if (secPrice !== undefined && secUnit !== undefined) {
-      newResult.result.push({ secPrice, secUnit });
+      resultData.push({ price: secPrice, unit: secUnit });
     }
     if (thirdPrice !== undefined && thirdUnit !== undefined) {
-      newResult.result.push({ thirdPrice, thirdUnit });
+      resultData.push({ price: thirdPrice, unit: thirdUnit });
     }
 
-    await newResult.save();
+    const existingData = await Result.findOne({ category, item });
 
-    res.status(201).json({ message: "Data saved successfully" });
+    if (existingData) {
+      resultCount?  existingData.resultCount=resultCount:existingData.resultCount
+      existingData.result = resultData;
+      await existingData.save();
+      res.status(200).json({ message: "Data updated successfully" });
+    } else {
+      const newResult = new Result({
+        resultCount,
+        category,
+        item,
+        result: resultData,
+      });
+      await newResult.save();
+      res.status(201).json({ message: "Data saved successfully" });
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
+
 
 module.exports = {
   getData,

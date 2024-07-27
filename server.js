@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 require("dotenv").config();
 const cors = require("cors");
-const PORT = 3000;
+const PORT =  3000||process.env.PORT;
 const multer = require("./util/mutler.js");
 
 const dataController = require("./Controller/getAndPost.js");
@@ -29,6 +29,7 @@ app.get("/showImage", dataController.showImage);
 
 app.post("/data", dataController.postData);
 
-app.listen(PORT, () => {
+app.listen( PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+0
