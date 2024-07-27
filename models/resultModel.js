@@ -6,10 +6,7 @@
 
     const ResultSchema= new mongoose.Schema({
 
-        resultCount:{
-            type:Number,
-            required:true
-        },
+    
         category:{
             type:String,
             required:true
