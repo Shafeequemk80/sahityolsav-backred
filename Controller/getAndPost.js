@@ -147,7 +147,6 @@ const postData = async (req, res) => {
       res.status(200).json({ message: "Data updated successfully" });
     } else {
       const newResult = new Result({
-        resultCount,
         category,
         item,
         result: resultData,
@@ -156,6 +155,7 @@ const postData = async (req, res) => {
       res.status(201).json({ message: "Data saved successfully" });
     }
   } catch (error) {
+    console.log( error.message)
     res.status(400).json({ message: error.message });
   }
 };
