@@ -160,6 +160,16 @@ const postData = async (req, res) => {
   }
 };
 
+const allResult= async (req,res)=>{
+  try {
+    
+    const AllData=await Result.find()
+
+  res.status(201).json({data:AllData})
+  } catch (error) {
+    res.status(400).json({message:error.message})
+  }
+}
 
 
 module.exports = {
@@ -167,4 +177,5 @@ module.exports = {
   addImage,
   postData,
   showImage,
+  allResult
 };

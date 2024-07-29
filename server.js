@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", dataController.getData);
 app.post("/imageUpload", multer.productImagesUpload, dataController.addImage);
 app.get("/showImage", dataController.showImage);
+app.get("/allresult", dataController.allResult);
 
 app.post("/data", dataController.postData);
 
