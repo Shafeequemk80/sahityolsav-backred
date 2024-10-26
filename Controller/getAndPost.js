@@ -179,7 +179,7 @@ const saveTeamPoint = async (req, res) => {
     // Transform req.body into the required format
     const resultsArray = Object.entries(req.body).map(([team, point]) => ({
       team,
-      point: point // Convert point to a string if needed
+      point: point || 0// Convert point to a string if needed
     }));
 
     // Save or update the document
