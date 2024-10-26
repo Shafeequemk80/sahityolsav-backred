@@ -1,8 +1,10 @@
 const Result = require("../models/resultModel");
 const ImageData = require("../models/imageDataModel");
+const TeamPoint = require("../models/teamPointModel");
 // Update the image record
 const fs = require("fs");
 const path = require("path");
+const { log } = require("console");
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
@@ -164,12 +166,58 @@ const allResult= async (req,res)=>{
   try {
     
     const AllData=await Result.find()
+console.log(AllData);
 
   res.status(201).json({data:AllData})
   } catch (error) {
-    res.status(400).json({message:error.message})
+    res.status(500).json({message:error.message})
   }
 }
+
+const saveTeamPoint = async (req, res) => {
+  try {
+    // Transform req.body into the required format
+    const resultsArray = Object.entries(req.body).map(([team, point]) => ({
+      team,
+      point: point.toString(), // Convert point to a string if needed
+    }));
+
+    // Save or update the document
+    const save = await TeamPoint.updateOne(
+      {}, // Add a filter if needed
+      { $set: { results: resultsArray } },
+      { upsert: true }
+    );
+
+    if (save.modifiedCount > 0 || save.upsertedCount > 0) {
+      res.status(200).json({ message: true });
+    } else {
+      res.status(400).json({ message: "No changes made." });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+const getTeamPoint = async (req, res) => {
+  try {
+    const data = await TeamPoint.findOne(); // Retrieve the document
+
+    if (data && data.results) {
+      // Sort the results array by the point value (convert to number for proper sorting)
+      const sortedResults = data.results.sort((a, b) => parseInt(b.point) - parseInt(a.point));
+      console.log(sortedResults); // Log sorted results
+      res.status(200).json({ data: sortedResults }); // Send sorted results
+    } else {
+      res.status(400).json({ message: "No data found" });
+    }
+  } catch (error) {
+    console.error("Error fetching team points:", error.message);
+    res.status(500).json({ message: "Server error" }); // Handle server error
+  }
+};
 
 
 module.exports = {
@@ -177,5 +225,7 @@ module.exports = {
   addImage,
   postData,
   showImage,
-  allResult
+  allResult,
+  saveTeamPoint,
+  getTeamPoint
 };
