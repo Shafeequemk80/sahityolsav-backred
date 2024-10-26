@@ -179,7 +179,7 @@ const saveTeamPoint = async (req, res) => {
     // Transform req.body into the required format
     const resultsArray = Object.entries(req.body).map(([team, point]) => ({
       team,
-      point: point.toString(), // Convert point to a string if needed
+      point: point // Convert point to a string if needed
     }));
 
     // Save or update the document
@@ -208,7 +208,7 @@ const getTeamPoint = async (req, res) => {
     if (data && data.results) {
       // Sort the results array by the point value (convert to number for proper sorting)
       const sortedResults = data.results.sort((a, b) => parseInt(b.point) - parseInt(a.point));
-      console.log(sortedResults); // Log sorted results
+    
       res.status(200).json({ data: sortedResults }); // Send sorted results
     } else {
       res.status(400).json({ message: "No data found" });
