@@ -28,7 +28,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
+console.log(process.env.FRONDEND)
 app.use(cors({
   origin: process.env.FRONDEND
 }));
