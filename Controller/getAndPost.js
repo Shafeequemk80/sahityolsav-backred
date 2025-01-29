@@ -2,9 +2,7 @@ const Result = require("../models/resultModel");
 const ImageData = require("../models/imageDataModel");
 const TeamPoint = require("../models/teamPointModel");
 // Update the image record
-const fs = require("fs");
-const path = require("path");
-const { log } = require("console");
+
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
@@ -166,7 +164,7 @@ const allResult= async (req,res)=>{
   try {
     
     const AllData=await Result.find()
-console.log(AllData);
+
 
   res.status(201).json({data:AllData})
   } catch (error) {

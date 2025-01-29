@@ -28,10 +28,11 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-console.log(process.env.FRONDEND)
-app.use(cors({
-  origin: process.env.FRONDEND
-}));
+
+// app.use(cors({
+//   origin: process.env.FRONDEND
+// }));
+app.use(cors());
 
 app.get("/", dataController.getData);
 app.post("/imageUpload", multer.productImagesUpload, dataController.addImage);
