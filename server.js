@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
 const PORT =  3000||process.env.PORT;
@@ -19,6 +20,7 @@ db.once("open", () => {
 
 //middleware to parse to json
 app.use(express.json());
+app.use(morgan("dev"));
 
 app.use(express.urlencoded({ extended: true }));
 // app.use("/static", express.static(path.join(__dirname, "../public")));
