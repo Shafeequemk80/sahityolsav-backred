@@ -1,6 +1,7 @@
 const Result = require("../models/resultModel");
 const ImageData = require("../models/imageDataModel");
 const TeamPoint = require("../models/teamPointModel");
+const { default: mongoose } = require("mongoose");
 // Update the image record
 
 const cloudinary = require("cloudinary").v2;
@@ -97,8 +98,6 @@ const addImage = async (req, res) => {
   }
 };
 
-
-
 const showImage = async (req, res) => {
   try {
     const savedData = await ImageData.find();
@@ -115,7 +114,6 @@ const showImage = async (req, res) => {
 const postData = async (req, res) => {
   try {
     const {
-    
       category,
       item,
       firstPrice,
@@ -129,19 +127,18 @@ const postData = async (req, res) => {
     const resultData = [];
 
     if (firstPrice !== undefined && firstUnit !== undefined) {
-      resultData.push({ firstPrice,  firstUnit });
+      resultData.push({ firstPrice, firstUnit });
     }
     if (secPrice !== undefined && secUnit !== undefined) {
-      resultData.push({secPrice, secUnit });
+      resultData.push({ secPrice, secUnit });
     }
     if (thirdPrice !== undefined && thirdUnit !== undefined) {
-      resultData.push({ thirdPrice,  thirdUnit });
+      resultData.push({ thirdPrice, thirdUnit });
     }
 
     const existingData = await Result.findOne({ category, item });
 
     if (existingData) {
-  
       existingData.result = resultData;
       await existingData.save();
       res.status(200).json({ message: "Data updated successfully" });
@@ -155,39 +152,50 @@ const postData = async (req, res) => {
       res.status(201).json({ message: "Data saved successfully" });
     }
   } catch (error) {
-    console.log( error.message)
+    console.log(error.message);
     res.status(400).json({ message: error.message });
   }
 };
 
-const allResult= async (req,res)=>{
+const allResult = async (req, res) => {
   try {
-    
-    const AllData=await Result.find()
+    const AllData = await Result.find();
 
-
-  res.status(201).json({data:AllData})
+    res.status(201).json({ data: AllData });
   } catch (error) {
-    res.status(500).json({message:error.message})
+    res.status(500).json({ message: error.message });
   }
-}
+};
 
 const saveTeamPoint = async (req, res) => {
   try {
     // Transform req.body into the required format
-    const resultsArray = Object.entries(req.body).map(([team, point]) => ({
-      team,
-      point: point || 0// Convert point to a string if needed
-    }));
+    let teamData = await TeamPoint.findOne();
 
-    // Save or update the document
-    const save = await TeamPoint.updateOne(
-      {}, // Add a filter if needed
-      { $set: { results: resultsArray } },
-      { upsert: true }
-    );
+    const input = req.body;
+    console.log(input);
+    
+    if (!teamData) {
+      teamData = new TeamPoint({ results: [] });
+    }
 
-    if (save.modifiedCount > 0 || save.upsertedCount > 0) {
+    for (const {team, point} of input) {
+      const teamObjectId = new mongoose.Types.ObjectId(team._id);
+      const existingTeam = teamData.results.find((result) => 
+        result.team.equals(teamObjectId)
+      );
+      if (existingTeam) {
+        existingTeam.point = Number(point);
+      } else {
+        teamData.results.push({
+          team: teamObjectId,
+          point: Number(point),
+        });
+      }
+    }
+    const savedData = await teamData.save();
+
+    if (savedData) {
       res.status(200).json({ message: true });
     } else {
       res.status(400).json({ message: "No changes made." });
@@ -198,25 +206,25 @@ const saveTeamPoint = async (req, res) => {
   }
 };
 
-
 const getTeamPoint = async (req, res) => {
   try {
-    const data = await TeamPoint.findOne(); // Retrieve the document
+    const data = await TeamPoint.findOne().populate("results.team"); // Retrieve the document
 
-    if (data && data.results) {
+    if (data && data?.results) {
       // Sort the results array by the point value (convert to number for proper sorting)
-      const sortedResults = data.results.sort((a, b) => parseInt(b.point) - parseInt(a.point));
-    
-      res.status(200).json({ data: sortedResults }); // Send sorted results
+      const sortedResults = data.results.sort(
+        (a, b) => parseInt(b.point) - parseInt(a.point)
+      );
+console.log(sortedResults)
+      res.status(200).json({ data: sortedResults.reverse() }); // Send sorted results
     } else {
-      res.status(400).json({ message: "No data found" });
+      res.status(400).json({ message: "No data Available" });
     }
   } catch (error) {
     console.error("Error fetching team points:", error.message);
     res.status(500).json({ message: "Server error" }); // Handle server error
   }
 };
-
 
 module.exports = {
   getData,
@@ -225,5 +233,5 @@ module.exports = {
   showImage,
   allResult,
   saveTeamPoint,
-  getTeamPoint
+  getTeamPoint,
 };

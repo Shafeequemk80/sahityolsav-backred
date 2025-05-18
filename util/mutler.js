@@ -43,25 +43,45 @@ const multer = require("multer");
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./cloudinary.js'); // Ensure this path is correct
 
-const storage = new CloudinaryStorage({
+const templateStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'product_images', // Adjust as needed
+    folder: 'template_images', // Adjust as needed
     allowed_formats: ['jpg', 'jpeg', 'png'] // Adjust formats if needed
   }
 });
 
-const uploadProduct = multer({ storage: storage });
+const bochureStorage= new CloudinaryStorage({
+  cloudinary:cloudinary,
+  params:{
+    folder:'brochure_Images',
+    allowed_formats:['jpg','jpeg',"png"]
+  }
+})
 
-const productImagesUpload = uploadProduct.fields([
+const uploadTemplate = multer({ storage: templateStorage });
+const uploadBrochure= multer({storage:bochureStorage})
+
+const templateImagesUpload = uploadTemplate.fields([
   { name: 'image1', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
   { name: 'image3', maxCount: 1 },
  
 ]);
 
+const brochureImageUpload= uploadBrochure.fields([
+  {name:'image1', maxCount:1},
+  {name:'image2', maxCount:1},
+  {name:'image3', maxCount:1},
+
+]
+)
+
+
+
 module.exports={
-    productImagesUpload
+    templateImagesUpload,
+    brochureImageUpload
 }
 
 

@@ -4,10 +4,13 @@ const TeamPointSchema = new mongoose.Schema({
     results: [ 
       {
        team:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'addTeamModel',
+        required:true
        },
        point:{
-        type:String
+        type:String,
+        default:0
        }
       }
     ],
