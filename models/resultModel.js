@@ -1,23 +1,18 @@
-    const { strict } = require('assert')
-    const mongoose= require('mongoose')
+const mongoose = require("mongoose");
 
+const ResultSchema = new mongoose.Schema({
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  item: {
+        type: mongoose.Schema.Types.ObjectId,
+    ref: "Item",
+    required: true,
+  },
+  result: [],
+});
 
-
-
-    const ResultSchema= new mongoose.Schema({
-
-    
-        category:{
-            type:String,
-            required:true
-            
-        },
-        item:{
-            type:String,
-            required:true
-        },
-        result:[]
-    })
-
-    const Result= mongoose.model("Result",ResultSchema)
-    module.exports=Result
+const Result = mongoose.model("Result", ResultSchema);
+module.exports = Result;

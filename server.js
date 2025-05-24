@@ -9,7 +9,10 @@ const multer = require("./util/mutler.js");
 
 const dataController = require("./Controller/getAndPost.js");
 const brochureController = require("./Controller/addBrochure.js");
-const teamController=require('./Controller/teamController.js')
+const teamController = require("./Controller/teamController.js");
+const categoryController = require("./Controller/categoryController.js");
+const itemController = require("./Controller/itemController.js");
+const checkProgramStarted = require("./middleware/program.js");
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -37,12 +40,15 @@ app.use((req, res, next) => {
 // }));
 app.use(cors());
 
-app.get("/", dataController.getData);
+
+app.get("/startprogram", dataController.startProgram);
+app.get("/checkstatprogram", dataController.checkStartProgram);
+app.get("/getresult", dataController.getData);
 app.post("/imageUpload", multer.templateImagesUpload, dataController.addImage);
 app.get("/showImage", dataController.showImage);
 app.get("/allresult", dataController.allResult);
 
-app.post("/data", dataController.postData);
+app.post("/saveresult", dataController.postData);
 app.post("/saveteampoint", dataController.saveTeamPoint);
 app.get("/teampoint", dataController.getTeamPoint);
 app.post("/addbrochure");
@@ -57,10 +63,26 @@ app.get("/getbrochuse", brochureController.getBrochuse);
 app.put("/adddescription", brochureController.addDescription);
 app.get("/getdescription", brochureController.getDescription);
 
-
 //teams
-app.post ('/addteamname',teamController.addTeam )
-app.get ('/getteamname',teamController.getTeam )
+app.post("/addteamname", teamController.addTeam);
+app.get("/getteamname", teamController.getTeam);
+app.delete("/deleteteam/:teamId", checkProgramStarted,teamController.deleteTeam);
+app.put("/editteam",checkProgramStarted, teamController.editTeam);
+
+//category
+app.post("/addcategoryname", categoryController.addCategory);
+app.delete(
+  "/deletecategoryname/:categoryId",checkProgramStarted,
+  categoryController.deletecategory
+);
+app.put("/editcategoryname",checkProgramStarted, categoryController.editCategoryName);
+app.get("/getcategoryname", categoryController.getCategory);
+
+//item
+app.post("/additemname", itemController.addItem);
+app.get("/getitemname/:categoryId", itemController.getItem);
+app.put("/edititemname",checkProgramStarted, itemController.editItemName);
+app.delete("/deleteitemname/:itemId",checkProgramStarted, itemController.deleteItem);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

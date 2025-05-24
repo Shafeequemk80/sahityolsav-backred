@@ -1,4 +1,5 @@
 const Brochure = require("../models/Brochure");
+const Description = require("../models/ThemeModel");
 
 const addBrochure = async (req, res) => {
   try {
@@ -26,7 +27,6 @@ const addBrochure = async (req, res) => {
         }
       }
       await brochureData.save();
-      console.log("updated broshureData");
       return res.status(200).json({ message: "Brochure updated successfully" });
     } else {
       const newBrochure = {};
@@ -42,8 +42,6 @@ const addBrochure = async (req, res) => {
 
       const saveBrochure = new Brochure(newBrochure);
       await saveBrochure.save();
-
-      console.log("Created new brochure data");
       return res.status(201).json({ message: "Brochuse created successfully" });
     }
   } catch (error) {
@@ -65,14 +63,14 @@ const getBrochuse = async (req, res) => {
 const addDescription = async (req, res) => {
   try {
     const {description } = req.body;
-    const descriptionData= await Brochure.findOne()
+    let descriptionData= await Description.findOne()
 
     if(descriptionData) {
         descriptionData.description= description
         await descriptionData.save()
     }else{
-     descriptionData= new Brochure({description})
-      await addNew.save()
+     descriptionData= new Description({description})
+      await descriptionData.save()
     }
     res.status(200).json({message:"description added successfully",data:descriptionData.description})
   } catch (error) {
@@ -82,7 +80,7 @@ const addDescription = async (req, res) => {
 };
 const getDescription = async (req, res) => {
     try {
-      const descriptionData = await Brochure.findOne();
+      const descriptionData = await Description.findOne();
       return res.status(200).json({ message:'Description data fethed successfully',data: descriptionData.description });
     } catch (error) {
         console.log(error.message);

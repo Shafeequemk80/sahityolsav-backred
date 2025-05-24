@@ -2,6 +2,9 @@ const Result = require("../models/resultModel");
 const ImageData = require("../models/imageDataModel");
 const TeamPoint = require("../models/teamPointModel");
 const { default: mongoose } = require("mongoose");
+const Category = require("../models/CategoryModel");
+const Item = require("../models/itemModel");
+const startProgramModel = require("../models/startProgram");
 // Update the image record
 
 const cloudinary = require("cloudinary").v2;
@@ -12,18 +15,80 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+
+const startProgram = async (req, res) => {
+  try {
+    const program = await startProgramModel.findOneAndUpdate(
+      {},                              // no filter — update any existing document
+      { startProgram: true },          // set to true
+      { upsert: true, new: true }      // create if not exists, return updated document
+    );
+
+if(program){    res.status(200).json({
+  success: true,
+  message: "Program started"
+});}
+  } catch (error) {
+    console.error("Error starting program:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const checkStartProgram = async (req, res) => {
+  try {
+    const program = await startProgramModel.findOne();
+console.log(program);
+
+
+    res.status(200).json({
+  success: program.startProgram,
+})
+  } catch (error) {
+    console.error("Error starting program:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 const getData = async (req, res) => {
   try {
     const { category, item } = req.query;
+    console.log(category, item);
 
-    const resultData = await Result.findOne({ category, item });
+    const resultData = await Result.findOne({ category, item }).populate(
+      "category item"
+    );
 
-    res.status(200).json({
-      data: resultData || false,
-    });
+    if (resultData) {
+      return res.status(200).json({
+        data: resultData,
+        success: true,
+      });
+    } else {
+      const itemData = await Item.findOne({
+        categoryName: category,
+        _id: item,
+      }).populate("categoryName");
+
+      return res.status(200).json({
+        data: {
+          category: {
+            categoryName: itemData.categoryName?.categoryName,
+          },
+          item: {
+            itemName: itemData.itemName,
+          },
+          result:false
+        },
+        success: false,
+        message: "Not published",
+      });
+    }
   } catch (error) {
-    console.log(error.message);
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
@@ -50,8 +115,6 @@ const addImage = async (req, res) => {
               (error, result) => {
                 if (error) {
                   console.error("Error deleting image:", error);
-                } else {
-                  console.log("Image deleted successfully:", result);
                 }
               }
             );
@@ -81,7 +144,7 @@ const addImage = async (req, res) => {
       // If no existing images, create a new record
       images.forEach((imageKey, index) => {
         if (req.files[imageKey]) {
-          updatedImages[imageKey].image = req.files[imageKey][0].oath;
+          updatedImages[imageKey].image = req.files[imageKey][0].path;
           updatedImages[imageKey].public_id = req.files[imageKey][0].filename;
         }
       });
@@ -114,29 +177,32 @@ const showImage = async (req, res) => {
 const postData = async (req, res) => {
   try {
     const {
-      category,
-      item,
-      firstPrice,
-      firstUnit,
-      secPrice,
-      secUnit,
-      thirdPrice,
-      thirdUnit,
+      categoryId,
+      itemId,
+      firstPrize,
+      firstTeam,
+      secPrize,
+      secTeam,
+      thirdPrize,
+      thirdTeam,
     } = req.body;
-
+    console.log(req.body);
     const resultData = [];
 
-    if (firstPrice !== undefined && firstUnit !== undefined) {
-      resultData.push({ firstPrice, firstUnit });
+    if (firstPrize !== undefined && firstTeam !== undefined) {
+      resultData.push({ firstPrize, firstTeam });
     }
-    if (secPrice !== undefined && secUnit !== undefined) {
-      resultData.push({ secPrice, secUnit });
+    if (secPrize !== undefined && secTeam !== undefined) {
+      resultData.push({ secPrize, secTeam });
     }
-    if (thirdPrice !== undefined && thirdUnit !== undefined) {
-      resultData.push({ thirdPrice, thirdUnit });
+    if (thirdPrize !== undefined && thirdTeam !== undefined) {
+      resultData.push({ thirdPrize, thirdTeam });
     }
 
-    const existingData = await Result.findOne({ category, item });
+    const existingData = await Result.findOne({
+      category: categoryId,
+      item: itemId,
+    });
 
     if (existingData) {
       existingData.result = resultData;
@@ -144,8 +210,8 @@ const postData = async (req, res) => {
       res.status(200).json({ message: "Data updated successfully" });
     } else {
       const newResult = new Result({
-        category,
-        item,
+        category: categoryId,
+        item: itemId,
         result: resultData,
       });
       await newResult.save();
@@ -159,11 +225,17 @@ const postData = async (req, res) => {
 
 const allResult = async (req, res) => {
   try {
-    const AllData = await Result.find();
+    const allData = await Result.find();
 
-    res.status(201).json({ data: AllData });
+    if (allData.length > 0) {
+      res.status(200).json({ success: true, data: allData });
+    } else {
+      res.status(404).json({ success: false, message: "No results found" });
+    }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -173,15 +245,14 @@ const saveTeamPoint = async (req, res) => {
     let teamData = await TeamPoint.findOne();
 
     const input = req.body;
-    console.log(input);
-    
+
     if (!teamData) {
       teamData = new TeamPoint({ results: [] });
     }
 
-    for (const {team, point} of input) {
+    for (const { team, point } of input) {
       const teamObjectId = new mongoose.Types.ObjectId(team._id);
-      const existingTeam = teamData.results.find((result) => 
+      const existingTeam = teamData.results.find((result) =>
         result.team.equals(teamObjectId)
       );
       if (existingTeam) {
@@ -215,8 +286,8 @@ const getTeamPoint = async (req, res) => {
       const sortedResults = data.results.sort(
         (a, b) => parseInt(b.point) - parseInt(a.point)
       );
-console.log(sortedResults)
-      res.status(200).json({ data: sortedResults.reverse() }); // Send sorted results
+
+      res.status(200).json({ data: sortedResults }); // Send sorted results
     } else {
       res.status(400).json({ message: "No data Available" });
     }
@@ -227,6 +298,8 @@ console.log(sortedResults)
 };
 
 module.exports = {
+  startProgram,
+  checkStartProgram,
   getData,
   addImage,
   postData,
