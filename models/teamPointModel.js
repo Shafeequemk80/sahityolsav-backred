@@ -5,7 +5,7 @@ const TeamPointSchema = new mongoose.Schema({
       {
        team:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'addTeamModel',
+        ref:'Team',
         required:true
        },
        point:{

@@ -5,6 +5,9 @@ const { default: mongoose } = require("mongoose");
 const Category = require("../models/CategoryModel");
 const Item = require("../models/itemModel");
 const startProgramModel = require("../models/startProgram");
+const AddBrochureModel = require("../models/Brochure");
+const Team = require("../models/Team");
+const addDescriptionModel = require("../models/ThemeModel");
 // Update the image record
 
 const cloudinary = require("cloudinary").v2;
@@ -19,30 +22,103 @@ cloudinary.config({
 const startProgram = async (req, res) => {
   try {
     const program = await startProgramModel.findOneAndUpdate(
-      {},                              // no filter — update any existing document
-      { startProgram: true },          // set to true
-      { upsert: true, new: true }      // create if not exists, return updated document
+      {}, // no filter — update any existing document
+      { startProgram: true }, // set to true
+      { upsert: true, new: true } // create if not exists, return updated document
     );
 
-if(program){    res.status(200).json({
-  success: true,
-  message: "Program started"
-});}
+    if (program) {
+      res.status(200).json({
+        success: true,
+        message: "Program started",
+      });
+    }
   } catch (error) {
     console.error("Error starting program:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+const stopProgram = async (req, res) => {
+  try {
+    const program = await startProgramModel.findOneAndUpdate(
+      {}, // no filter — update any existing document
+      { startProgram: false }, // set to false
+      { upsert: true, new: true } // create if not exists, return updated document
+    );
+
+    // Delete all results
+    const deleteAllResult = await Result.deleteMany({}); // Deletes all documents
+
+    if (program&&deleteAllResult) {
+      res.status(200).json({
+        success: true,
+        message: "Program stopped",
+      });
+    }else{
+       res.status(400).json({
+        success: false,
+        message: "Program stoping failed",
+      });
+    }
+  } catch (error) {
+    console.error("Error stopping program:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const resetProgram = async (req, res) => {
+  try {
+    const program = await startProgramModel.findOneAndUpdate(
+      {}, 
+      { startProgram: false }, 
+      { upsert: true, new: true }
+    );
+
+    // Delete all data from collections
+    const [resultDel, teamDel, pointDel, categoryDel, descDel, itemDel] = await Promise.all([
+      Result.deleteMany({}),
+      Team.deleteMany({}),
+      TeamPoint.deleteMany({}),
+      Category.deleteMany({}),
+      addDescriptionModel.deleteMany({}),
+      Item.deleteMany({}),
+    ]);
+
+    const allSuccessful = program && 
+      resultDel.acknowledged && 
+      teamDel.acknowledged && 
+      pointDel.acknowledged && 
+      categoryDel.acknowledged && 
+      descDel.acknowledged && 
+      itemDel.acknowledged;
+
+    if (allSuccessful) {
+      res.status(200).json({
+        success: true,
+        message: "Program reset successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Program reset failed",
+      });
+    }
+
+  } catch (error) {
+    console.error("Error resetting program:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 const checkStartProgram = async (req, res) => {
   try {
     const program = await startProgramModel.findOne();
-console.log(program);
-
+    console.log(program);
 
     res.status(200).json({
-  success: program.startProgram,
-})
+      success: program.startProgram,
+    });
   } catch (error) {
     console.error("Error starting program:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -77,7 +153,7 @@ const getData = async (req, res) => {
           item: {
             itemName: itemData.itemName,
           },
-          result:false
+          result: false,
         },
         success: false,
         message: "Not published",
@@ -225,7 +301,7 @@ const postData = async (req, res) => {
 
 const allResult = async (req, res) => {
   try {
-    const allData = await Result.find();
+    const allData = await Result.find().populate('category item');
 
     if (allData.length > 0) {
       res.status(200).json({ success: true, data: allData });
@@ -300,6 +376,8 @@ const getTeamPoint = async (req, res) => {
 module.exports = {
   startProgram,
   checkStartProgram,
+  stopProgram,
+  resetProgram,
   getData,
   addImage,
   postData,
@@ -307,4 +385,5 @@ module.exports = {
   allResult,
   saveTeamPoint,
   getTeamPoint,
+  
 };

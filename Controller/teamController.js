@@ -2,7 +2,6 @@ const { Router } = require("express");
 const Teams = require("../models/Team");
 const mongoose = require("mongoose");
 const TeamPoint = require("../models/teamPointModel");
-const { findOne } = require("../models/Brochure");
 
 const addTeam = async (req, res) => {
   const session = await mongoose.startSession();
@@ -57,6 +56,12 @@ const deleteTeam = async (req, res) => {
   const session = await mongoose.startSession();
   try {
     const { teamId } = req.params;
+    console.log(teamId);
+     if (!mongoose.Types.ObjectId.isValid(teamId)) {
+      console.log("Invalid Team ID");
+      
+      return res.status(400).json({ message: "Invalid Team ID" });
+    }
     session.startTransaction();
     const isTeamAvailable = await Teams.findById(teamId).session(session);
     if (isTeamAvailable) {

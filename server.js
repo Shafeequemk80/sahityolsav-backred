@@ -43,6 +43,8 @@ app.use(cors());
 
 app.get("/startprogram", dataController.startProgram);
 app.get("/checkstatprogram", dataController.checkStartProgram);
+app.get("/stopprogram", dataController.stopProgram);
+app.get("/resetprogram", dataController.resetProgram);
 app.get("/getresult", dataController.getData);
 app.post("/imageUpload", multer.templateImagesUpload, dataController.addImage);
 app.get("/showImage", dataController.showImage);
@@ -71,10 +73,7 @@ app.put("/editteam",checkProgramStarted, teamController.editTeam);
 
 //category
 app.post("/addcategoryname", categoryController.addCategory);
-app.delete(
-  "/deletecategoryname/:categoryId",checkProgramStarted,
-  categoryController.deletecategory
-);
+app.delete("/deletecategoryname/:categoryId",checkProgramStarted,categoryController.deletecategory);
 app.put("/editcategoryname",checkProgramStarted, categoryController.editCategoryName);
 app.get("/getcategoryname", categoryController.getCategory);
 
