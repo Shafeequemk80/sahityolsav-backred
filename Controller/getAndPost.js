@@ -357,15 +357,15 @@ const getTeamPoint = async (req, res) => {
   try {
     const data = await TeamPoint.findOne().populate("results.team"); // Retrieve the document
 
-    if (data && data?.results) {
+    if (data && data?.results?.length>0) {
       // Sort the results array by the point value (convert to number for proper sorting)
       const sortedResults = data.results.sort(
         (a, b) => parseInt(b.point) - parseInt(a.point)
       );
 
-      res.status(200).json({ data: sortedResults }); // Send sorted results
+      res.status(200).json({ success:true,data: sortedResults }); // Send sorted results
     } else {
-      res.status(400).json({ message: "No data Available" });
+      res.status(200).json({success:false, message: "No data Available" });
     }
   } catch (error) {
     console.error("Error fetching team points:", error.message);
