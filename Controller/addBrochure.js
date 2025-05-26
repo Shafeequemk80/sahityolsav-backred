@@ -53,47 +53,101 @@ const addBrochure = async (req, res) => {
 const getBrochuse = async (req, res) => {
   try {
     const getBrochuse = await Brochure.findOne();
-    return res.status(200).json({ message :'data feted successfully',data: getBrochuse });
+    return res
+      .status(200)
+      .json({ message: "data feted successfully", data: getBrochuse });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({message:'server error'})
+    res.status(500).json({ message: "server error" });
   }
 };
 
 const addDescription = async (req, res) => {
   try {
-    const {description } = req.body;
-    let descriptionData= await Description.findOne()
+    const { description } = req.body;
+    let descriptionData = await Description.findOne();
 
-    if(descriptionData) {
-        descriptionData.description= description
-        await descriptionData.save()
-    }else{
-     descriptionData= new Description({description})
-      await descriptionData.save()
+    if (descriptionData) {
+      descriptionData.description = description;
+      await descriptionData.save();
+    } else {
+      descriptionData = new Description({ description });
+      await descriptionData.save();
     }
-    res.status(200).json({message:"description added successfully",data:descriptionData.description})
+    res
+      .status(200)
+      .json({
+        message: "description added successfully",
+        data: descriptionData.description,
+      });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({message:'Server Error'})
+    res.status(500).json({ message: "Server Error" });
   }
 };
 const getDescription = async (req, res) => {
-    try {
-      const descriptionData = await Description.findOne();
-      return res.status(200).json({ message:'Description data fethed successfully',data: descriptionData.description });
-    } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ message:'server error' });
+  try {
+    const descriptionData = await Description.findOne();
+    return res
+      .status(200)
+      .json({
+        message: "Description data fethed successfully",
+        data: descriptionData.description,
+      });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+const getTitle = async (req, res) => {
+  try {
+    const titleData = await Description.findOne();
+    return res
+      .status(200)
+      .json({
+        message: "title data fethed successfully",
+        data: titleData.title,
+      });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "server error" });
+  }
+};
 
-    
+const addTitle = async (req, res) => {
+  try {
+    const { title } = req.body;
+
+    const updatedTitle = await Description.findOne();
+    if (!updatedTitle) {
+      return res.status(404).json({
+        success: false,
+        message: "No description document found to update.",
+      });
     }
-  };
-
+    updatedTitle.title = title;
+    const savedData = await updatedTitle.save();
+    if (savedData) {
+      res.status(200).json({
+        success: true,
+        message: "Title added or updated successfully",
+        data: savedData,
+      });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 
 module.exports = {
   addBrochure,
   getBrochuse,
   addDescription,
-  getDescription
+  getDescription,
+  addTitle,
+  getTitle,
 };

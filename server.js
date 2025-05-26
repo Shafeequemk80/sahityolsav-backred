@@ -64,6 +64,8 @@ app.put(
 app.get("/getbrochuse", brochureController.getBrochuse);
 app.put("/adddescription", brochureController.addDescription);
 app.get("/getdescription", brochureController.getDescription);
+app.put("/addtitle", brochureController.addTitle);
+app.get("/gettitle", brochureController.getTitle);
 
 //teams
 app.post("/addteamname", teamController.addTeam);
