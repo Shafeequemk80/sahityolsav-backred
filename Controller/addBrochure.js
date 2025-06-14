@@ -99,55 +99,11 @@ const getDescription = async (req, res) => {
     return res.status(500).json({ message: "server error" });
   }
 };
-const getTitle = async (req, res) => {
-  try {
-    const titleData = await Description.findOne();
-    return res
-      .status(200)
-      .json({
-        message: "title data fethed successfully",
-        data: titleData.title,
-      });
-  } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({ message: "server error" });
-  }
-};
 
-const addTitle = async (req, res) => {
-  try {
-    const { title } = req.body;
-
-    const updatedTitle = await Description.findOne();
-    if (!updatedTitle) {
-      return res.status(404).json({
-        success: false,
-        message: "No description document found to update.",
-      });
-    }
-    updatedTitle.title = title;
-    const savedData = await updatedTitle.save();
-    if (savedData) {
-      res.status(200).json({
-        success: true,
-        message: "Title added or updated successfully",
-        data: savedData,
-      });
-    }
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
 
 module.exports = {
   addBrochure,
   getBrochuse,
   addDescription,
   getDescription,
-  addTitle,
-  getTitle,
 };

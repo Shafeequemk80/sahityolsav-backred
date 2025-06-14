@@ -5,11 +5,7 @@ const addDescriptionSchema = new mongoose.Schema({
     type: String,
     required: true,
     default:'add Theme of the fest'
-  },
-   title: {
-    type: String,
-    required: true,
-  },
+  }
 });
 
 const addDescriptionModel = mongoose.model("Description", addDescriptionSchema);
