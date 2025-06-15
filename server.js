@@ -75,13 +75,13 @@ app.put("/editteam",checkProgramStarted, teamController.editTeam);
 //category
 app.post("/addcategoryname", categoryController.addCategory);
 app.delete("/deletecategoryname/:categoryId",checkProgramStarted,categoryController.deletecategory);
-app.put("/editcategoryname",checkProgramStarted, categoryController.editCategoryName);
+app.put("/editcategoryname", categoryController.editCategoryName);
 app.get("/getcategoryname", categoryController.getCategory);
 
 //item
 app.post("/additemname", itemController.addItem);
 app.get("/getitemname/:categoryId", itemController.getItem);
-app.put("/edititemname",checkProgramStarted, itemController.editItemName);
+app.put("/edititemname", itemController.editItemName);
 app.delete("/deleteitemname/:itemId",checkProgramStarted, itemController.deleteItem);
 
 app.listen(PORT, () => {
