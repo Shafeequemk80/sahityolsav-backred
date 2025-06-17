@@ -14,6 +14,11 @@ const TeamPointSchema = new mongoose.Schema({
        }
       }
     ],
+    afterCount:{
+       type:String,
+        default:0,
+        required:true
+    }
   });
   
   const TeamPoint = mongoose.model("TeamPoint", TeamPointSchema);

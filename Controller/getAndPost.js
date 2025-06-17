@@ -320,10 +320,12 @@ const saveTeamPoint = async (req, res) => {
     // Transform req.body into the required format
     let teamData = await TeamPoint.findOne();
 
-    const input = req.body;
+    const input = req.body.formData;
+    const afterCount = req.body.afterCount
+console.log(afterCount);
 
     if (!teamData) {
-      teamData = new TeamPoint({ results: [] });
+      teamData = new TeamPoint({ results: [],afterCount });
     }
 
     for (const { team, point } of input) {
@@ -340,6 +342,7 @@ const saveTeamPoint = async (req, res) => {
         });
       }
     }
+    teamData.afterCount=afterCount
     const savedData = await teamData.save();
 
     if (savedData) {
@@ -362,8 +365,8 @@ const getTeamPoint = async (req, res) => {
       const sortedResults = data.results.sort(
         (a, b) => parseInt(b.point) - parseInt(a.point)
       );
-
-      res.status(200).json({ success:true,data: sortedResults }); // Send sorted results
+      const afterCount= data.afterCount
+      res.status(200).json({ success:true,data: {sortedResults,afterCount} }); // Send sorted results
     } else {
       res.status(200).json({success:false, message: "No data Available" });
     }
