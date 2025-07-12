@@ -13,6 +13,7 @@ const teamController = require("./Controller/teamController.js");
 const categoryController = require("./Controller/categoryController.js");
 const itemController = require("./Controller/itemController.js");
 const checkProgramStarted = require("./middleware/program.js");
+const { saveGalleryImage, getAllImages, deleteGalleryImage, get3Images } = require("./Controller/galleryController.js");
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -83,6 +84,13 @@ app.post("/additemname", itemController.addItem);
 app.get("/getitemname/:categoryId", itemController.getItem);
 app.put("/edititemname", itemController.editItemName);
 app.delete("/deleteitemname/:itemId",checkProgramStarted, itemController.deleteItem);
+
+//gallery
+app.post("/upload-gallery", multer.galleryImagesUpload, saveGalleryImage);
+app.get("/get-gallery", getAllImages);
+app.get("/get3-gallery", get3Images);
+app.delete("/delete-gallery/:id", deleteGalleryImage);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

@@ -59,8 +59,18 @@ const bochureStorage= new CloudinaryStorage({
   }
 })
 
+const gallerytorage= new CloudinaryStorage({
+  cloudinary:cloudinary,
+  params:{
+    folder:'gallery_Images',
+    allowed_formats:['jpg','jpeg',"png"]
+  }
+})
 const uploadTemplate = multer({ storage: templateStorage });
 const uploadBrochure= multer({storage:bochureStorage})
+const uploadGallery= multer({storage:gallerytorage})
+
+const galleryImagesUpload = uploadGallery.single("image");
 
 const templateImagesUpload = uploadTemplate.fields([
   { name: 'image1', maxCount: 1 },
@@ -81,7 +91,8 @@ const brochureImageUpload= uploadBrochure.fields([
 
 module.exports={
     templateImagesUpload,
-    brochureImageUpload
+    brochureImageUpload,
+    galleryImagesUpload
 }
 
 

@@ -1,5 +1,6 @@
 const Brochure = require("../models/Brochure");
 const Description = require("../models/ThemeModel");
+const cloudinary = require('../util/cloudinary')
 
 const addBrochure = async (req, res) => {
   try {
