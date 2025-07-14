@@ -31,7 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use(cors({
-  origin: process.env.FRONDEND
+  origin: process.env.FRONDEND,
+  credentials: true
 }));
 //app.use(cors());
 
