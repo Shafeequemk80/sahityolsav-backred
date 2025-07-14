@@ -87,7 +87,7 @@ app.get("/api/get3-gallery", get3Images);
 app.delete("/api/delete-gallery/:id", deleteGalleryImage);
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',() => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 0;
