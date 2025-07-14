@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
-const PORT = 3000 || process.env.PORT;
+const PORT = 5000 || process.env.PORT;
 const multer = require("./util/mutler.js");
 
 const dataController = require("./Controller/getAndPost.js");
@@ -29,12 +29,12 @@ app.use(morgan("dev"));
 
 app.use(express.urlencoded({ extended: true }));
 // app.use("/static", express.static(path.join(__dirname, "../public")));
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.FRONDEND);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT,PATCH, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", process.env.FRONDEND);
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT,PATCH, DELETE");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
 
 // app.use(cors({
 //   origin: process.env.FRONDEND
@@ -42,54 +42,54 @@ app.use((req, res, next) => {
 app.use(cors());
 
 
-app.get("/startprogram", dataController.startProgram);
-app.get("/checkstatprogram", dataController.checkStartProgram);
-app.get("/stopprogram", dataController.stopProgram);
-app.get("/resetprogram", dataController.resetProgram);
-app.get("/getresult", dataController.getData);
-app.post("/imageUpload", multer.templateImagesUpload, dataController.addImage);
-app.get("/showImage", dataController.showImage);
-app.get("/allresult", dataController.allResult);
+app.get("/api/startprogram", dataController.startProgram);
+app.get("/api/checkstatprogram", dataController.checkStartProgram);
+app.get("/api/stopprogram", dataController.stopProgram);
+app.get("/api/resetprogram", dataController.resetProgram);
+app.get("/api/getresult", dataController.getData);
+app.post("/api/imageUpload", multer.templateImagesUpload, dataController.addImage);
+app.get("/api/showImage", dataController.showImage);
+app.get("/api/allresult", dataController.allResult);
 
-app.post("/saveresult", dataController.postData);
-app.post("/saveteampoint", dataController.saveTeamPoint);
-app.get("/teampoint", dataController.getTeamPoint);
-app.post("/addbrochure");
+app.post("/api/saveresult", dataController.postData);
+app.post("/api/saveteampoint", dataController.saveTeamPoint);
+app.get("/api/teampoint", dataController.getTeamPoint);
+app.post("/api/addbrochure");
 
 //add brochure
 app.put(
-  "/addBrochure",
+  "/api/addBrochure",
   multer.brochureImageUpload,
   brochureController.addBrochure
 );
-app.get("/getbrochuse", brochureController.getBrochuse);
-app.put("/adddescription", brochureController.addDescription);
-app.get("/getdescription", brochureController.getDescription);
+app.get("/api/getbrochuse", brochureController.getBrochuse);
+app.put("/api/adddescription", brochureController.addDescription);
+app.get("/api/getdescription", brochureController.getDescription);
 
 
 //teams
-app.post("/addteamname", teamController.addTeam);
-app.get("/getteamname", teamController.getTeam);
-app.delete("/deleteteam/:teamId", checkProgramStarted,teamController.deleteTeam);
-app.put("/editteam",checkProgramStarted, teamController.editTeam);
+app.post("/api/addteamname", teamController.addTeam);
+app.get("/api/getteamname", teamController.getTeam);
+app.delete("/api/deleteteam/:teamId", checkProgramStarted,teamController.deleteTeam);
+app.put("/api/editteam",checkProgramStarted, teamController.editTeam);
 
 //category
-app.post("/addcategoryname", categoryController.addCategory);
-app.delete("/deletecategoryname/:categoryId",checkProgramStarted,categoryController.deletecategory);
-app.put("/editcategoryname", categoryController.editCategoryName);
-app.get("/getcategoryname", categoryController.getCategory);
+app.post("/api/addcategoryname", categoryController.addCategory);
+app.delete("/api/deletecategoryname/:categoryId",checkProgramStarted,categoryController.deletecategory);
+app.put("/api/editcategoryname", categoryController.editCategoryName);
+app.get("/api/getcategoryname", categoryController.getCategory);
 
 //item
-app.post("/additemname", itemController.addItem);
-app.get("/getitemname/:categoryId", itemController.getItem);
-app.put("/edititemname", itemController.editItemName);
-app.delete("/deleteitemname/:itemId",checkProgramStarted, itemController.deleteItem);
+app.post("/api/additemname", itemController.addItem);
+app.get("/api/getitemname/:categoryId", itemController.getItem);
+app.put("/api/edititemname", itemController.editItemName);
+app.delete("/api/deleteitemname/:itemId",checkProgramStarted, itemController.deleteItem);
 
 //gallery
-app.post("/upload-gallery", multer.galleryImagesUpload, saveGalleryImage);
-app.get("/get-gallery", getAllImages);
-app.get("/get3-gallery", get3Images);
-app.delete("/delete-gallery/:id", deleteGalleryImage);
+app.post("/api/upload-gallery", multer.galleryImagesUpload, saveGalleryImage);
+app.get("/api/get-gallery", getAllImages);
+app.get("/api/get3-gallery", get3Images);
+app.delete("/api/delete-gallery/:id", deleteGalleryImage);
 
 
 app.listen(PORT, () => {
